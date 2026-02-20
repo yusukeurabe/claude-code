@@ -1,36 +1,76 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
+function getErrorMessage(msg: string): string {
+  if (msg.includes('Invalid login credentials')) return 'メールアドレスまたはパスワードが正しくありません。'
+  if (msg.includes('Email not confirmed')) return 'メールアドレスの確認が完了していません。確認メールをご確認ください。'
+  if (msg.includes('User already registered')) return 'このメールアドレスはすでに登録されています。'
+  if (msg.includes('Password should be at least')) return 'パスワードは6文字以上で入力してください。'
+  if (msg.includes('Unable to validate email address')) return '有効なメールアドレスを入力してください。'
+  if (msg.includes('Signup is disabled')) return '現在、新規登録は無効になっています。'
+  return msg
+}
+
 export default function AuthPage() {
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, user, loading } = useAuth()
+  const navigate = useNavigate()
+
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  // すでにログイン済みならダッシュボードへリダイレクト
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/', { replace: true })
+    }
+  }, [user, loading, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setMessage(null)
-    setLoading(true)
+    setSubmitting(true)
 
     if (isSignUp) {
-      const { error } = await signUp(email, password, fullName)
+      const { data, error } = await signUp(email, password, fullName)
       if (error) {
-        setError(error.message)
+        setError(getErrorMessage(error.message))
+      } else if (data?.session) {
+        // メール認証なし → 即ログイン成功
+        navigate('/', { replace: true })
       } else {
-        setMessage('確認メールを送信しました。メールを確認してください。')
+        // メール認証あり → 確認メール案内
+        setMessage('確認メールを送信しました。メールを確認してからログインしてください。')
       }
     } else {
       const { error } = await signIn(email, password)
       if (error) {
-        setError('メールアドレスまたはパスワードが正しくありません。')
+        setError(getErrorMessage(error.message))
       }
+      // 成功時は onAuthStateChange が発火 → useEffect がリダイレクト
     }
-    setLoading(false)
+
+    setSubmitting(false)
+  }
+
+  const handleToggleMode = () => {
+    setIsSignUp(!isSignUp)
+    setError(null)
+    setMessage(null)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        読み込み中...
+      </div>
+    )
   }
 
   return (
@@ -110,10 +150,10 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={submitting}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2.5 rounded-lg transition-colors"
           >
-            {loading ? '処理中...' : isSignUp ? 'アカウント作成' : 'ログイン'}
+            {submitting ? '処理中...' : isSignUp ? 'アカウント作成' : 'ログイン'}
           </button>
         </form>
 
@@ -122,7 +162,7 @@ export default function AuthPage() {
           {isSignUp ? 'すでにアカウントをお持ちですか？' : 'アカウントをお持ちでないですか？'}
           {' '}
           <button
-            onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null) }}
+            onClick={handleToggleMode}
             className="text-blue-600 hover:underline font-medium"
           >
             {isSignUp ? 'ログイン' : '新規登録'}
