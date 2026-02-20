@@ -67,6 +67,9 @@ export default function ReportCard({ report, onDelete }: Props) {
 
       {/* Meta */}
       <div className="flex flex-wrap gap-2 mb-3">
+        <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">
+          {report.report_type}
+        </span>
         {report.category && (
           <span
             className="text-xs px-2 py-0.5 rounded-full font-medium"

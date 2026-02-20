@@ -27,6 +27,8 @@ export interface Report {
   tags: string[]
   tomorrow_plan: string | null
   impression: string | null
+  raw_input: string | null
+  report_type: string
   created_at: string
   updated_at: string
   // joined
@@ -44,6 +46,8 @@ export interface ReportFormData {
   tags: string[]
   tomorrow_plan: string
   impression: string
+  raw_input: string
+  report_type: string
 }
 
 export interface ReportFilters {

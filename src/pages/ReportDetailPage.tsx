@@ -98,6 +98,9 @@ export default function ReportDetailPage() {
 
         {/* Meta badges */}
         <div className="flex flex-wrap gap-2">
+          <span className="text-sm bg-purple-50 text-purple-600 px-3 py-1 rounded-full font-medium">
+            {report.report_type}
+          </span>
           {report.category && (
             <span
               className="text-sm px-3 py-1 rounded-full font-medium"
@@ -141,6 +144,15 @@ export default function ReportDetailPage() {
         {report.tomorrow_plan && (
           <Section title="明日の予定">
             <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{report.tomorrow_plan}</p>
+          </Section>
+        )}
+
+        {/* 元のメモ */}
+        {report.raw_input && (
+          <Section title="元の業務メモ">
+            <p className="text-gray-600 whitespace-pre-wrap leading-relaxed text-sm bg-gray-50 rounded-lg p-3">
+              {report.raw_input}
+            </p>
           </Section>
         )}
 

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useReports } from '../hooks/useReports'
-import { useCategories } from '../hooks/useCategories'
 import ReportForm from '../components/reports/ReportForm'
 import type { Report, ReportFormData } from '../types'
 
@@ -10,7 +9,6 @@ export default function ReportEditPage() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const { reports, updateReport } = useReports(user?.id)
-  const { categories } = useCategories(user?.id)
   const navigate = useNavigate()
   const [report, setReport] = useState<Report | null>(null)
 
@@ -43,13 +41,12 @@ export default function ReportEditPage() {
         >
           ← 戻る
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">日報を編集</h1>
+        <h1 className="text-2xl font-bold text-gray-900">報告書を編集</h1>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <ReportForm
           initialData={report}
-          categories={categories}
           onSubmit={handleSubmit}
           onCancel={() => navigate(`/reports/${id}`)}
         />

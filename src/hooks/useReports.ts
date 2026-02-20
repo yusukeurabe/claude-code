@@ -59,6 +59,8 @@ export function useReports(userId: string | undefined) {
       tags: formData.tags,
       tomorrow_plan: formData.tomorrow_plan || null,
       impression: formData.impression || null,
+      raw_input: formData.raw_input || null,
+      report_type: formData.report_type || '日報',
     }
 
     const { error } = await supabase.from('reports').insert(payload)
@@ -78,6 +80,8 @@ export function useReports(userId: string | undefined) {
       tags: formData.tags,
       tomorrow_plan: formData.tomorrow_plan || null,
       impression: formData.impression || null,
+      raw_input: formData.raw_input || null,
+      report_type: formData.report_type || '日報',
     }
 
     const { error } = await supabase
